@@ -100,6 +100,7 @@ export async function createTrans(req: Request, res: Response){
         email: req.body.email
       }
     })
+
     if (user === null){
       user = await prisma.user.create({
         data: {
@@ -109,6 +110,7 @@ export async function createTrans(req: Request, res: Response){
         }
       })
     }
+    
 
     const  isBorrowing = await IsProductItemBorrowing(req.body.product_item_id)
     if (isBorrowing){
@@ -139,7 +141,7 @@ export async function createTrans(req: Request, res: Response){
     await updateProductsAvailable(result.productItem.productId)
     await updateProductsFrequency(result.productItem.productId)
     res.status(201).json(result)
-  }catch (e: any) {
+  }catch (e) {
     if (e instanceof Prisma.PrismaClientKnownRequestError) {
       // The .code property can be accessed in a type-safe manner
       if (e.code === 'P2002') {
