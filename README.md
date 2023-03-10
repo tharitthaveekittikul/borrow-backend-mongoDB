@@ -14,6 +14,13 @@
 
 ... or you need to use your db server. you can config at `.env` then docker is optional.
 
+## exec to mongo cmd
+
+```bash
+docker exec -it borrow-backend-mongodb-database-1 bash
+mongosh -u root -p example
+```
+
 ## start this project
 
 ```bash
