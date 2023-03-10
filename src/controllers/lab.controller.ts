@@ -4,7 +4,7 @@ import { Request, Response } from 'express';
 const prisma = new PrismaClient()
 
 export async function getLabs(req: Request , res: Response) {
-  const labs = await prisma.lab.findMany() 
+  const labs = await prisma.room.findMany() 
   res.json(labs)
 }
 
@@ -16,7 +16,7 @@ export async function createLab(req: Request, res: Response){
     })
     return
   }
-  const result = await prisma.lab.create({
+  const result = await prisma.room.create({
     data: {
       name: req.body.name
     }
@@ -31,7 +31,7 @@ export async function deleteLab(req: Request, res: Response){
       message: "can't delete lab",
     })
   }
-  const result = await prisma.lab.delete({
+  const result = await prisma.room.delete({
     where: { id: id },
   })
   res.json(result)

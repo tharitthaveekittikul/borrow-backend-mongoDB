@@ -14,7 +14,7 @@ app.use(express.json())
 
 app.use('/lab', labRoute)
 app.use('/source', sourceRoute)
-app.use('/products', productRoute)
+app.use('/product', productRoute)
 app.use('/productItem', productItemRoute)
 app.use('/transaction', transactionRoute)
 app.use('/user', userRoute)

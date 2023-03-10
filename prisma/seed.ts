@@ -11,7 +11,7 @@ async function main() {
 async function createLab() {
   let labs = ["Lab A", "Lab B", "Lab C"]
   for (const lab of labs) {
-    await prisma.lab.upsert({
+    await prisma.room.upsert({
       where: {
         name: lab
       },

@@ -12,7 +12,7 @@ export async function getItems(req: Request , res: Response) {
           status: false
         }
       },
-      lab: true,
+      room: true,
       source: true,
       product: true,
     }
@@ -39,7 +39,7 @@ export async function getItemById(req: Request , res: Response) {
           status: false
         }
       },
-      lab: true,
+      room: true,
       source: true,
       product: true,
     }
@@ -73,7 +73,7 @@ export async function getItemByProduct(req: Request , res: Response) {
           status: false
         }
       },
-      lab: true,
+      room: true,
       source: true,
       product: true,
     }
@@ -109,7 +109,7 @@ export async function getItemByProductAvailable(req: Request , res: Response) {
     },
     include: {
       transactions: true,
-      lab: true,
+      room: true,
       source: true,
       product: true,
     }
@@ -129,12 +129,12 @@ export async function createItem(req: Request, res: Response){
       data: {
         serial_no: req.body.serial_no,
         sourceId: req.body.sourceId,
-        labId: req.body.labId,
+        roomId: req.body.labId,
         productId: req.body.productId
       },
       include: {
         transactions: true,
-        lab: true,
+        room: true,
         source: true,
         product: true,
       }

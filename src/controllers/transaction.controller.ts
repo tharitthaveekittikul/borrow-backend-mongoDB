@@ -16,7 +16,7 @@ export async function getTrans(req: Request , res: Response) {
         user: true,
         productItem: {
           include: {
-            lab: true,
+            room: true,
             product: true,
             source: true
           }
@@ -31,7 +31,7 @@ export async function getTrans(req: Request , res: Response) {
       user: true,
       productItem: {
         include: {
-          lab: true,
+          room: true,
           product: true,
           source: true
         }
@@ -58,7 +58,7 @@ export async function getTransById(req: Request , res: Response) {
       user: true,
       productItem: {
         include: {
-          lab: true,
+          room: true,
           product: true,
           source: true
         }
@@ -83,7 +83,7 @@ export async function getTransBorrowing(req: Request, res: Response){
       user: true,
       productItem: {
         include: {
-          lab: true,
+          room: true,
           product: true,
           source: true
         }
@@ -119,10 +119,21 @@ export async function createTrans(req: Request, res: Response){
       })
       return
     }
+    const serial = await prisma.productItem.findFirst({
+      where: {
+        serial_no: req.body.product_item_id
+      }
+    })
+    if (serial === null){
+      res.status(400).json({
+        message: "Cannot find serial number"
+      })
+      return
+    }
     const result = await prisma.transaction.create({
       data: {
         userId: user.id,
-        productItemId: req.body.product_item_id,
+        productItemId: serial?.id,
         location: req.body.location,
         end_date: new Date(req.body.end_date),
         deadline: new Date(req.body.deadline)
@@ -131,7 +142,7 @@ export async function createTrans(req: Request, res: Response){
         user: true,
         productItem: {
           include: {
-            lab: true,
+            room: true,
             product: true,
             source: true
           }

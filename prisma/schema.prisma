@@ -14,8 +14,8 @@ model ProductItem {
   id            String        @id @default(auto()) @map("_id") @db.ObjectId
   serial_no     String        @unique
   broken_status Boolean       @default(false)
-  lab           Lab?          @relation(fields: [labId], references: [id]) // ? is optional
-  labId         String?       @db.ObjectId
+  room          Room?         @relation(fields: [roomId], references: [id]) // ? is optional
+  roomId        String?       @db.ObjectId
   source        Source?       @relation(fields: [sourceId], references: [id])
   sourceId      String?       @db.ObjectId
   product       Product       @relation(fields: [productId], references: [id])
@@ -23,7 +23,7 @@ model ProductItem {
   transactions  Transaction[]
 }
 
-model Lab {
+model Room {
   id           String        @id @default(auto()) @map("_id") @db.ObjectId
   name         String        @unique
   ProductItems ProductItem[]
@@ -38,9 +38,11 @@ model Source {
 model Product {
   id           String        @id @default(auto()) @map("_id") @db.ObjectId
   name         String        @unique
+  description  String?
   frequency    Int           @default(0)
   total        Int           @default(0)
   available    Int           @default(0)
+  image        String?
   ProductItems ProductItem[]
 }
 
@@ -60,9 +62,18 @@ model Transaction {
 
 model User {
   id           String        @id @default(auto()) @map("_id") @db.ObjectId
-  role         String?
   email        String
-  username     String
+  name         String
   phone        String
   transactions Transaction[]
+}
+
+model Admin {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  role     String
+  email    String @unique
+  username String @unique
+  password String
+  phone    String
 }
