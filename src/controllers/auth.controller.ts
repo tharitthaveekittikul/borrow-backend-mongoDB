@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
+import { getCurrent } from "../utils/auth.util";
 
 const prisma = new PrismaClient()
 
@@ -27,13 +28,10 @@ export async function login(req: Request, res: Response){
             })
         }
 
-        const fallbackSecret = crypto.randomBytes(16).toString('hex');
         const token = jwt.sign({
             id: user.id
-        }, process.env.JWT_TOKEN || fallbackSecret)
-
-        res.status(200).json({token})
-        // res.status(200).json({user})
+        }, process.env.JWT_TOKEN!, { expiresIn: "1h" })
+        res.status(200).json({user,token})
     }
     catch (error){
         res.status(500).json({
@@ -45,6 +43,11 @@ export async function login(req: Request, res: Response){
 
 export async function addAdmin(req: Request, res: Response){
     try{
+        const user = getCurrent(req,res)
+        if (!user){
+            return res.status(404).send("You must be logged in");
+        }
+
         const {email, password,name} = req.body;
         const existingUser = await prisma.admin.findUnique({
             where: {email}
@@ -63,14 +66,7 @@ export async function addAdmin(req: Request, res: Response){
                 name: name
             },
         })
-
-        const fallbackSecret = crypto.randomBytes(16).toString('hex');
-        const token = jwt.sign({
-            id: newAdmin.id
-        }, process.env.JWT_SECRET || fallbackSecret )
-        
-        res.status(200).json({token})
-        // res.status(200).json({newAdmin: newAdmin})
+        res.status(200).json({newAdmin: newAdmin})
     }
     catch (error){
         res.status(500).json({
@@ -82,31 +78,17 @@ export async function addAdmin(req: Request, res: Response){
 
 export async function getAdmin(req: Request, res: Response){
     try{
-        // const fallbackSecret = crypto.randomBytes(16).toString('hex');
-        // const token = req.headers.authorization?.split(' ')[1];
-        // const decodedToken: any = jwt.verify(
-        //     token!,
-        //     process.env.JWT_SECRET || fallbackSecret
-        // )
+        const user = getCurrent(req,res)
+        if (!user){
+            return res.status(404).send("User not found");
+        }
         const {email} = req.body
 
         if(!email){
             const user = await prisma.admin.findMany();
             return res.status(200).json({user})
         }
-        // const user = await prisma.admin.findUnique({
-        //     where: { id: decodedToken.id}
-        // })
-        const user = await prisma.admin.findUnique({
-            where: { email: email}
-        })
-
-        if (!user){
-            return res.status(404).send("User not found");
-        }
         res.status(200).json({user})
-
-
     }
     catch (error){
         res.status(500).json({message:"Server error",error: error})
@@ -115,6 +97,10 @@ export async function getAdmin(req: Request, res: Response){
 
 export async function deleteAdmin(req: Request, res: Response){
     try{
+        const user = getCurrent(req,res)
+        if (!user){
+            return res.status(404).send("User not found");
+        }
         const {id} = req.params
         if(id === undefined){
             res.json({
@@ -130,4 +116,3 @@ export async function deleteAdmin(req: Request, res: Response){
         res.status(500).json({message:"Server error",error: error})
     }
 }
-
