@@ -106,7 +106,7 @@ export async function createTrans(req: Request, res: Response){
         data: {
           email: req.body.email,
           phone: req.body.phone,
-          username: req.body.username
+          name: req.body.name
         }
       })
     }

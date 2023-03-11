@@ -6,6 +6,7 @@ import productRoute from './routes/products.route'
 import productItemRoute from './routes/productItem.route'
 import transactionRoute from './routes/transaction.route'
 import userRoute from './routes/user.route'
+import authRoute from './routes/auth.route'
 
 const prisma = new PrismaClient()
 const app = express()
@@ -18,6 +19,7 @@ app.use('/product', productRoute)
 app.use('/productItem', productItemRoute)
 app.use('/transaction', transactionRoute)
 app.use('/user', userRoute)
+app.use('/admin', authRoute)
 
 app.get('/', (req, res) => {
   res.send("It's work")

@@ -69,11 +69,10 @@ model User {
 }
 
 model Admin {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
   name     String
-  role     String
-  email    String @unique
-  username String @unique
+  role     String  @default("Staff")
+  email    String  @unique
   password String
-  phone    String
+  phone    String?
 }
