@@ -1,4 +1,4 @@
-import { Request , Response} from "express";
+import { Request , Response, NextFunction} from "express";
 import { PrismaClient } from '@prisma/client'
 import jwt from "jsonwebtoken";
 
@@ -19,4 +19,13 @@ export async function getCurrent(req : Request){
     catch (error) {
         return null
     }
+}
+
+export async function authMiddleware(req: Request, res: Response, next: NextFunction){
+    const user = await getCurrent(req)
+    if (!user){
+        return res.status(404).send("Admin not found");
+    }
+    res.locals.user = user;
+    next()
 }

@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { Prisma,PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -43,11 +43,6 @@ export async function login(req: Request, res: Response){
 
 export async function addAdmin(req: Request, res: Response){
     try{
-        const user = await getCurrent(req)
-        if (!user){
-            return res.status(404).send("You must be logged in");
-        }
-
         const {email, password,name} = req.body;
         const existingUser = await prisma.admin.findUnique({
             where: {email}
@@ -78,10 +73,6 @@ export async function addAdmin(req: Request, res: Response){
 
 export async function getAdmin(req: Request, res: Response){
     try{
-        const user = await getCurrent(req)
-        if (!user){
-            return res.status(404).send("Admin not found");
-        }
         const {email} = req.body
 
         if(!email){
@@ -101,13 +92,9 @@ export async function getAdmin(req: Request, res: Response){
 
 export async function deleteAdmin(req: Request, res: Response){
     try{
-        const user = await getCurrent(req)
-        if (!user){
-            return res.status(404).send("Admin not found");
-        }
         const {id} = req.params
         if(id === undefined){
-            res.json({
+            return res.json({
                 message: "can't delete admin no params",
             })
         }
@@ -117,16 +104,20 @@ export async function deleteAdmin(req: Request, res: Response){
         res.status(200).json(result)
     }
     catch (error){
+        if (error instanceof Prisma.PrismaClientKnownRequestError){
+            if(error.code === "P2025"){
+                res.json({
+                    message: "ID not found"
+                })
+            }
+        }
         res.status(500).json({message:"Server error",error: error})
     }
 }
 
 export async function updateProfile(req: Request, res: Response){
     try{
-        const user = await getCurrent(req)
-        if(!user){
-            return res.status(404).send("Admin not found");
-        }
+        const user = res.locals.user
         let password = user.password
         if(req.body.password){
             password = await bcrypt.hash(req.body.password, 10)
