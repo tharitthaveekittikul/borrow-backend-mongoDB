@@ -43,7 +43,7 @@ export async function login(req: Request, res: Response){
 
 export async function addAdmin(req: Request, res: Response){
     try{
-        const user = getCurrent(req,res)
+        const user = await getCurrent(req)
         if (!user){
             return res.status(404).send("You must be logged in");
         }
@@ -78,17 +78,21 @@ export async function addAdmin(req: Request, res: Response){
 
 export async function getAdmin(req: Request, res: Response){
     try{
-        const user = getCurrent(req,res)
+        const user = await getCurrent(req)
         if (!user){
-            return res.status(404).send("User not found");
+            return res.status(404).send("Admin not found");
         }
         const {email} = req.body
 
         if(!email){
-            const user = await prisma.admin.findMany();
-            return res.status(200).json({user})
+            const result = await prisma.admin.findMany();
+            return res.status(200).json({result})
         }
-        res.status(200).json({user})
+        const result = await prisma.admin.findUnique({
+            where: {email: email}
+        })
+    
+        res.status(200).json({result})
     }
     catch (error){
         res.status(500).json({message:"Server error",error: error})
@@ -97,9 +101,9 @@ export async function getAdmin(req: Request, res: Response){
 
 export async function deleteAdmin(req: Request, res: Response){
     try{
-        const user = getCurrent(req,res)
+        const user = await getCurrent(req)
         if (!user){
-            return res.status(404).send("User not found");
+            return res.status(404).send("Admin not found");
         }
         const {id} = req.params
         if(id === undefined){
@@ -109,6 +113,34 @@ export async function deleteAdmin(req: Request, res: Response){
         }
         const result = await prisma.admin.delete({
             where: {id : id}
+        })
+        res.status(200).json(result)
+    }
+    catch (error){
+        res.status(500).json({message:"Server error",error: error})
+    }
+}
+
+export async function updateProfile(req: Request, res: Response){
+    try{
+        const user = await getCurrent(req)
+        if(!user){
+            return res.status(404).send("Admin not found");
+        }
+        let password = user.password
+        if(req.body.password){
+            password = await bcrypt.hash(req.body.password, 10)
+        }
+
+        const updatedProfile = {
+            name: req.body.name || user.name,
+            role: req.body.role || user.role,
+            password: password || user.password,
+            phone: req.body.phone || user.phone
+        }
+        const result = await prisma.admin.update({
+            where: {id: user.id},
+            data:updatedProfile
         })
         res.status(200).json(result)
     }
